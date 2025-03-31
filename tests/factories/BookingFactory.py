@@ -4,7 +4,6 @@ from datetime import datetime, timedelta, date, time
 from src.models.Booking import Booking
 from .AppCategoryFactory import AppCategoryFactory
 
-
 class BookingFactory(factory.Factory[Booking]):
     """
     It's best to create an instance with .create() instead of the constructor.
