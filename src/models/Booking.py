@@ -22,4 +22,4 @@ class Booking:
         return deadline
 
     def canBeCancelled(self) -> bool:
-        return datetime.now() < self.scheduledStartTime
+        return datetime.now() < self.cancellationDeadline
