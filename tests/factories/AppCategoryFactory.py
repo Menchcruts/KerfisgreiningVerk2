@@ -4,6 +4,9 @@ import factory.random
 from src.models.AppointmentCategory import AppointmentCategory
 
 class AppCategoryFactory(factory.Factory[AppointmentCategory]):
+    """
+    It's best to create an instance with .create() instead of the constructor.
+    """
     class Meta:
         model = AppointmentCategory
 
