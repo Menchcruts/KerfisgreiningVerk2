@@ -10,4 +10,5 @@ class BusinessHours:
     closeTime: datetime.time
 
     def __str__(self):
+        # Left justifies the day by the length of 'Wednesday'
         return f"{self.dayOfWeek:<9} | {self.openTime} - {self.closeTime}"
