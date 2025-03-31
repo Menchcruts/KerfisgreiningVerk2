@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 
 class BookingService:
     
+    @staticmethod
     def isAvailableForBooking(
             business: Business, 
             appointmentCategory:AppointmentCategory,
@@ -16,6 +17,7 @@ class BookingService:
             ) -> bool:
         ...
 
+    @staticmethod
     def createBooking(
             user:User, 
             appointmentCategory:AppointmentCategory, 
@@ -23,8 +25,10 @@ class BookingService:
             ) -> Booking:
         ...
     
+    @staticmethod
     def cancelBooking(booking:Booking, user: User) -> bool:
         ...
 
+    @staticmethod
     def getBookingsForUser(user: User) -> list[Booking]:
         ...
