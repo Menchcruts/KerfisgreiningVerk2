@@ -9,26 +9,63 @@ from datetime import datetime, timedelta
 
 class BookingService:
     
+    def __init__(self):
+        self.bookings = []  
+
     @staticmethod
     def isAvailableForBooking(
             business: Business, 
             appointmentCategory:AppointmentCategory,
             scheduledTime: datetime
             ) -> bool:
+        
+        # day_of_week = scheduledTime.strftime("%A")
+        # business_hours = business.getBusinessHoursForDay(day_of_week)
+
+        # if not business_hours:
+        #     return False  
+
+        # opening_time = datetime.combine(scheduledTime.date(), business_hours.openingTime)
+        # closing_time = datetime.combine(scheduledTime.date(), business_hours.closingTime)
+    
+        # if not (opening_time <= scheduledTime <= closing_time):
+        #     return False
+
+        # endTime = scheduledTime + timedelta(minutes=appointmentCategory.lengthInMinutes)
+        # for booking in business.getBookings():
+        #     if scheduledTime < booking.scheduledEndTime and endTime > booking.scheduledStartTime:
+        #         return False  
+
+        # return True  
         ...
+
 
     @staticmethod
     def createBooking(
+            self,
             user:User, 
             appointmentCategory:AppointmentCategory, 
             scheduledTime:datetime
             ) -> Booking:
-        ...
+        
+        endTime = scheduledTime + timedelta(minutes=appointmentCategory.lengthInMinutes)
+
+        booking = Booking(
+            Start=scheduledTime, 
+            End=endTime, 
+            Category=appointmentCategory)
+
+        self.bookings.append(booking)
+
+        return booking
     
     @staticmethod
-    def cancelBooking(booking:Booking, user: User) -> bool:
-        ...
+    def cancelBooking(self, booking:Booking, user: User) -> bool:
+        if booking.user == user and booking.canBeCancelled():
+            self.bookings.remove(booking)
+            return True  
+        return False  
 
     @staticmethod
-    def getBookingsForUser(user: User) -> list[Booking]:
-        ...
+    def getBookingsForUser(self, user: User) -> list[Booking]:
+        return [booking for booking in self.bookings if booking.user == user]
