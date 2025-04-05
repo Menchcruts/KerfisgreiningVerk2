@@ -14,18 +14,21 @@ class BookingService:
 
     @staticmethod
     def isAvailableForBooking(
+            self,
             business: Business, 
-            appointmentCategory:AppointmentCategory,
+            appointmentCategory: AppointmentCategory,
             scheduledTime: datetime
             ) -> bool:
         
         day_of_week = scheduledTime.strftime("%A")
-        business_hours = business.getBusinessHoursForDay(day_of_week)
+        business_hours = next(
+            (hours for hours in business.businessHours if hours.dayOfWeek == day_of_week), 
+            None
+        )
 
         if not business_hours:
             return False
 
-        # Build full datetime ranges for comparison
         opening_time = datetime.combine(scheduledTime.date(), business_hours.openingTime)
         closing_time = datetime.combine(scheduledTime.date(), business_hours.closingTime)
 
@@ -34,10 +37,11 @@ class BookingService:
         if scheduledTime < opening_time or appointment_end_time > closing_time:
             return False
 
-        # Check for overlaps with existing bookings
-        for booking in business.getBookings():
-            if scheduledTime < booking.scheduledEndTime and appointment_end_time > booking.scheduledStartTime:
+        for booking in self.bookings:
+            if booking.business == business and scheduledTime < booking.scheduledEndTime and appointment_end_time > booking.scheduledStartTime:
                 return False
+
+        return True
 
 
     @staticmethod
@@ -47,7 +51,7 @@ class BookingService:
             appointmentCategory:AppointmentCategory, 
             scheduledTime:datetime
             ) -> Booking:
-        
+
         endTime = scheduledTime + timedelta(minutes=appointmentCategory.lengthInMinutes)
 
         booking = Booking(
