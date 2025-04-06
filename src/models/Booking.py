@@ -3,9 +3,8 @@ from .AppointmentCategory import AppointmentCategory
 from datetime import datetime, timedelta
 
 class Booking:
-    def __init__(self, user_id, Start:datetime, End:datetime, Category:AppointmentCategory):
+    def __init__(self, Start:datetime, End:datetime, Category:AppointmentCategory):
         self.id: uuid.UUID = uuid.uuid1()
-        self.user_id = user_id
         
         assert isinstance(Start, datetime)
         assert isinstance(End, datetime)
