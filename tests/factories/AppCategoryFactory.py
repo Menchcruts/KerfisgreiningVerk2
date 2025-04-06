@@ -1,7 +1,7 @@
 import factory, random
 import factory.random
 
-from src.models.AppointmentCategory import AppointmentCategory
+from ...src.models.AppointmentCategory import AppointmentCategory
 
 class AppCategoryFactory(factory.Factory[AppointmentCategory]):
     """

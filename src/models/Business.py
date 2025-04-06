@@ -1,17 +1,20 @@
 import uuid
 from .AppointmentCategory import AppointmentCategory
 from .BusinessHours import BusinessHours
+from .Booking import Booking
 
 
 class Business:
-    def __init__(self, Name:str):
+    def __init__(self, name:str):
         self.id: uuid.UUID = uuid.uuid1()
         
-        assert isinstance(Name, str)
-        self.name: str = Name
+        assert isinstance(name, str)
+        self.name: str = name
         
         self.appointmentCategories: list[AppointmentCategory]    = []
         self.businessHours: list[BusinessHours]                  = []
+
+        self.bookings: list[Booking] = []
 
     def addAppointmentCategory(self, category: AppointmentCategory) -> bool:
         if not isinstance(category, AppointmentCategory):
@@ -20,5 +23,6 @@ class Business:
 
     def addBusinessHours(self, hours: BusinessHours) -> bool:
         if not isinstance(hours, BusinessHours):
-            raise ValueError(f"{type(category)} is not of value {BusinessHours.__name__}")
+            raise ValueError(f"{type(hours)} is not of value {BusinessHours.__name__}")
         self.businessHours.append(hours)
+        
