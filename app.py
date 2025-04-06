@@ -10,13 +10,13 @@ from datetime import datetime, timedelta
 app = Flask(__name__)
 
 
-businesses = []
-users = []
-bookings = []
+businesses = {}
+users = {}
+bookings = {}
 
 @app.route('/register_user', methods=['POST'])
 def register_user():
-    data = request.json 
+    data = request.json
     name = data.get('name')
     email = data.get('email')
     
@@ -59,10 +59,16 @@ def add_appointment_category(business_id):
     data = request.json 
     category_name = data.get('category_name')
     if not category_name:
-        print('Category name is required')
         return jsonify({'error': 'Category name is required'}), 400
 
-    business = Business.get_business_by_id(str(business_id))
+    lengthInMinutes = data.get('lengthInMinutes')
+    minNumOfHoursBeforeCancellation = data.get('minNumOfHoursBeforeCancellation')
+    
+    if lengthInMinutes is None or minNumOfHoursBeforeCancellation is None:
+        abort(400, 'lengthInMinutes and minNumOfHoursBeforeCancellation are required')
+
+    business = businesses.get(str(business_id))
+        
     if not business:
         return jsonify({'error': 'Business not found'}), 404
     
@@ -83,10 +89,24 @@ def add_appointment_category(business_id):
 @app.route('/book_appointment', methods=['POST'])
 def book_appointment():
     data = request.json
-    user_id = data.get('userId')
-    business_id = data.get('businessId')
-    appointment_category_id = data.get('appointmentCategoryId')
-    scheduled_time = data.get('scheduledTime')
+    user_id = data.get('user_id')
+    business_id = data.get('business_id')
+    appointment_category_id = data.get('appointment_category_id')
+    scheduled_time = data.get('scheduled_time')
+    
+    user = users.get(str(user_id))
+    if not user:
+        abort(404, "User not found.")
+
+    business = businesses.get(business_id)
+    if not business:
+        abort(404, "Business not found.")
+    
+    appointment_category = None
+    for ac in appointment_category:
+        if str(ac.id) == appointment_category_id:
+            appointment_category = ac
+            break
     
     if not user_id or not business_id or not appointment_category_id or not scheduled_time:
         abort(400, 'User ID, business ID, appointment category ID and scheduled time are required')
@@ -108,13 +128,17 @@ def book_appointment():
 
 @app.route('/get_user_bookings/<user_id>', methods=['GET'])
 def get_user_bookings(user_id):    
+    user = users.get(user_id)
+    if not user:
+        abort(404, 'User not found')
+    
     user_bookings = [
         {
         'id': str(booking.id),
         'scheduled_start_time': booking.scheduledStartTime,
         'scheduled_end_time': booking.scheduledEndTime,
         }
-        for booking in bookings if booking.user_id == user_id and booking.scheduledStartTime >= datetime.now()
+        for booking in bookings if booking.user_id == user.id and booking.scheduledStartTime >= datetime.now()
         ]
     if not user_bookings:
         return jsonify({'message': 'No upcoming bookings found'}), 404
