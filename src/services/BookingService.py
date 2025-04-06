@@ -32,6 +32,7 @@ class BookingService:
         # business_hours = business.businessHours.get(day_of_week, None)
 
         if not business_hours:
+            print(f"Business is closed on {day_of_week}.")
             return False
 
         opening_time = datetime.combine(scheduledTime.date(), business_hours.openTime)
@@ -40,6 +41,7 @@ class BookingService:
         appointment_end_time = scheduledTime + timedelta(minutes=appointmentCategory.lengthInMinutes)
 
         if scheduledTime < opening_time or appointment_end_time > closing_time:
+            print(f"Appointment time {scheduledTime} is outside business hours ({opening_time} - {closing_time}).")
             return False
 
         return True
@@ -55,6 +57,7 @@ class BookingService:
         endTime = scheduledTime + timedelta(minutes=appointmentCategory.lengthInMinutes)
 
         booking = Booking(
+            user=user,
             Start=scheduledTime, 
             End=endTime, 
             Category=appointmentCategory)
@@ -70,5 +73,8 @@ class BookingService:
                 return True
         return False
 
-    def getBookingsForUser(self, user: User) -> list[Booking]:
-        return [booking for booking in self.bookings.values() if booking.user.id == user.id]
+    def getBookingsForUser(self, user_id) -> list[Booking]:
+        user_bookings = [booking for booking in self.bookings.values() if booking.user == user_id]
+        return user_bookings
+    
+    

@@ -25,3 +25,15 @@ class Booking:
 
     def canBeCancelled(self) -> bool:
         return datetime.now() < self.cancellationDeadline
+    
+    def to_dict(self):
+        return {
+            'id': str(self.id),  
+            'user_id': self.user, 
+            'scheduledStartTime': self.scheduledStartTime.isoformat(),
+            'scheduledEndTime': self.scheduledEndTime.isoformat(),   
+            'appointmentCategory': self.appointmentCategory.name     
+        }
+        
+    def __str__(self):
+        return f"Booking ID: {self.id} | User: {self.user} | Start: {self.scheduledStartTime} | End: {self.scheduledEndTime} | Category: {self.appointmentCategory.name}"
