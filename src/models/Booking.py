@@ -1,11 +1,13 @@
 import uuid
 from .AppointmentCategory import AppointmentCategory
+from .User import User
 from datetime import datetime, timedelta
 
 class Booking:
-    def __init__(self, Start:datetime, End:datetime, Category:AppointmentCategory):
+    def __init__(self, user:User, Start:datetime, End:datetime, Category:AppointmentCategory):
         self.id: uuid.UUID = uuid.uuid1()
-        
+        self.user = user
+
         assert isinstance(Start, datetime)
         assert isinstance(End, datetime)
         assert isinstance(Category, AppointmentCategory)

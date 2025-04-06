@@ -10,9 +10,9 @@ from datetime import datetime, timedelta
 app = Flask(__name__)
 
 
-businesses = {}
-users = {}
-bookings = {}
+businesses:dict[str, Business] = {}
+users:dict[str, User] = {}
+service = BookingService()
 
 @app.route('/register_user', methods=['POST'])
 def register_user():
@@ -74,20 +74,20 @@ def book_appointment():
         abort(404, "Business not found.")
     
     appointment_category = None
-    for ac in appointment_category:
+    for ac in business.appointmentCategories:
         if str(ac.id) == appointment_category_id:
             appointment_category = ac
             break
     
-    if not user or not business or not appointment_category:
-        abort(400, 'User, business and appointment category are required')
+    if not appointment_category:
+        abort(400, 'Appointment category is required')
         
     scheduled_time = datetime.fromisoformat(scheduled_time)
     if not BookingService.isAvailableForBooking(business, appointment_category, scheduled_time):
         abort(400, 'Time slot is not available')
-        
-    booking = Booking(Start = scheduled_time, End = scheduled_time + timedelta(minutes=appointment_category.lengthInMinutes), Category = appointment_category)
-    bookings.append(booking)
+
+    booking = service.createBooking(user, appointment_category, scheduled_time)
+    # booking = Booking(Start = scheduled_time, End = scheduled_time + timedelta(minutes=appointment_category.lengthInMinutes), Category = appointment_category)
     return jsonify({'message': 'Appointment booked successfully', "booking": str(booking)}), 201
 
 @app.route('/get_user_bookings/<user_id>', methods=['GET'])
@@ -96,7 +96,7 @@ def get_user_bookings(user_id):
     if not user:
         abort(404, 'User not found')
         
-    user_bookings = [str(booking) for booking in bookings if booking.scheduledStartTime >= datetime.now()]
+    user_bookings = service.getBookingsForUser(user)
     return jsonify({'bookings': user_bookings}), 200
 
 if __name__ == '__main__':

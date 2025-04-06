@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+
 from ..models.Business import Business
 from ..models.User import User
 from ..models.BusinessHours import BusinessHours
@@ -10,41 +12,39 @@ from datetime import datetime, timedelta
 class BookingService:
     
     def __init__(self):
-        self.bookings = []  
+        self.bookings:dict[str, Booking] = {}
 
     @staticmethod
     def isAvailableForBooking(
-            self,
             business: Business, 
             appointmentCategory: AppointmentCategory,
             scheduledTime: datetime
             ) -> bool:
-        
-        day_of_week = scheduledTime.strftime("%A")
-        business_hours = next(
-            (hours for hours in business.businessHours if hours.dayOfWeek == day_of_week), 
-            None
-        )
+        days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+
+        day_of_week = days[scheduledTime.weekday()]
+        business_hours = None
+        for hour in business.businessHours:
+            if hour.dayOfWeek == day_of_week:
+                business_hours = hour
+                break
+
+        # business_hours = business.businessHours.get(day_of_week, None)
 
         if not business_hours:
             return False
 
-        opening_time = datetime.combine(scheduledTime.date(), business_hours.openingTime)
-        closing_time = datetime.combine(scheduledTime.date(), business_hours.closingTime)
+        opening_time = datetime.combine(scheduledTime.date(), business_hours.openTime)
+        closing_time = datetime.combine(scheduledTime.date(), business_hours.closeTime)
 
         appointment_end_time = scheduledTime + timedelta(minutes=appointmentCategory.lengthInMinutes)
 
         if scheduledTime < opening_time or appointment_end_time > closing_time:
             return False
 
-        for booking in self.bookings:
-            if booking.business == business and scheduledTime < booking.scheduledEndTime and appointment_end_time > booking.scheduledStartTime:
-                return False
-
         return True
 
 
-    @staticmethod
     def createBooking(
             self,
             user:User, 
@@ -59,18 +59,16 @@ class BookingService:
             End=endTime, 
             Category=appointmentCategory)
 
-        self.bookings.append(booking)
+        self.bookings[str(booking.id)] = booking
 
         return booking
     
-    @staticmethod
     def cancelBooking(self, booking:Booking, user: User) -> bool:
         if booking.user == user and booking.canBeCancelled():
-            if booking in self.bookings:
-                self.bookings.remove(booking)
+            if str(booking.id) in self.bookings:
+                del self.bookings[str(booking.id)]
                 return True
-        return False  
+        return False
 
-    @staticmethod
     def getBookingsForUser(self, user: User) -> list[Booking]:
-        return [booking for booking in self.bookings if hasattr(booking, 'user') and booking.user == user]
+        return [booking for booking in self.bookings.values() if booking.user.id == user.id]

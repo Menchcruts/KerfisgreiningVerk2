@@ -1,6 +1,7 @@
 import uuid
 from .AppointmentCategory import AppointmentCategory
 from .BusinessHours import BusinessHours
+from .Booking import Booking
 
 
 class Business:
@@ -13,6 +14,8 @@ class Business:
         self.appointmentCategories: list[AppointmentCategory]    = []
         self.businessHours: list[BusinessHours]                  = []
 
+        self.bookings: list[Booking] = []
+
     def addAppointmentCategory(self, category: AppointmentCategory) -> bool:
         if not isinstance(category, AppointmentCategory):
             raise ValueError(f"{type(category)} is not of value {AppointmentCategory.__name__}")
@@ -22,3 +25,4 @@ class Business:
         if not isinstance(hours, BusinessHours):
             raise ValueError(f"{type(category)} is not of value {BusinessHours.__name__}")
         self.businessHours.append(hours)
+        

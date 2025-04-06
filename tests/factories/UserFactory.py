@@ -1,6 +1,6 @@
 import factory
 
-from src.models.User import User
+from ...src.models.User import User
 
 class UserFactory(factory.Factory[User]):
     """

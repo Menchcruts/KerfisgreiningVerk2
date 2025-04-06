@@ -1,7 +1,7 @@
 import factory, faker
 from datetime import datetime, time, date
 
-from src.models.BusinessHours import BusinessHours
+from ...src.models.BusinessHours import BusinessHours
 
 faker.Faker().time_object()
 
